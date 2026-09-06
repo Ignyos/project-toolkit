@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Desktop Host",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/Ignyos.LanPortal.Host/bin/Debug/net9.0-windows/Ignyos.LanPortal.Host.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}/Ignyos.LanPortal.Host",
+      "stopAtEntry": false,
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Publish-dev (Dev Lane)",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/publish-dev.ps1",
+      "args": []
+    },
+    {
+      "name": "Publish-live (Production Lane)",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/publish-live.ps1",
+      "args": []
+    }
+  ]
+}

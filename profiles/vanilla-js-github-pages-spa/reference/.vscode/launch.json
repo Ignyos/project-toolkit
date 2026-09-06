@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Clean",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/clean.ps1",
+      "args": []
+    },
+    {
+      "name": "Release",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/release.ps1",
+      "args": []
+    },
+    {
+      "name": "Dev Publish (Build+Commit+Push)",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/dev-publish.ps1",
+      "args": [
+        "-RequiredBranch",
+        "dev"
+      ]
+    },
+    {
+      "name": "Dev Publish (Build+Commit, No Push)",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/dev-publish.ps1",
+      "args": [
+        "-RequiredBranch",
+        "dev",
+        "-NoPush"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+name: Deploy Dev Site
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # build.ps1 validates that ./docs exists and is ready for deployment.
+      - name: "Validate deployment source (./docs)"
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: "Set dev CNAME in source output (./docs/CNAME)"
+        shell: pwsh
+        run: Set-Content -LiteralPath ./docs/CNAME -Value 'kap-dev.ignyos.com' -NoNewline
+
+      # publish_dir is local source (KAP repo). Destination is root of the external repo
+      # because destination_dir is intentionally omitted.
+      - name: Publish source ./docs to KAP-dev repo root
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          personal_token: ${{ secrets.DEV_PAGES_TOKEN }}
+          external_repository: ${{ secrets.DEV_PAGES_REPO }}
+          publish_branch: main
+          publish_dir: ./docs
+          force_orphan: true

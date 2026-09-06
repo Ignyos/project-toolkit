@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ignyos Project Toolkit — AI-Native Engineering Infrastructure</title>
+    <meta name="description" content="Scaffold, govern, and release any project using AI agents guided by architectural specs — with zero repository noise or permanent dependencies." />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <header class="site-header">
+        <div class="brand-row">
+            <p class="kicker">Ignyos Open Source</p>
+            <h1>Project Toolkit</h1>
+            <p class="tagline">Scaffold, govern, and release any software project using AI agents guided by architectural specs — with zero repository clutter or permanent dependencies.</p>
+        </div>
+    </header>
+
+    <main class="layout">
+        <!-- Quick Start Card -->
+        <section class="panel reveal">
+            <h2>Quick Start</h2>
+            <p class="subtext">Copy this prompt and paste it into VS Code Copilot Chat in any project workspace to begin:</p>
+            
+            <div class="code-block-container">
+                <button type="button" class="copy-button" id="copyPromptButton">Copy Prompt</button>
+                <pre class="code-block"><code id="promptText">Please bootstrap or reconcile this repository using the Ignyos Project Toolkit.
+
+Follow these steps:
+1. Run `git clone --depth 1 https://github.com/Ignyos/project-toolkit .scratch-toolkit` in the terminal to shallow-clone the toolkit.
+2. Run `.\.scratch-toolkit\bootstrap.ps1` in PowerShell to begin the interactive interview (choose Full Profile or Project Management Only, then Greenfield or Existing).
+3. Follow the directives output by the bootstrap script and profile documents (`architecture.md`, `requirements.md`, `implementation-steps.md`, `acceptance-checklist.md`).
+4. Apply origin breadcrumbs per `shared/breadcrumb-spec.md` to generated files.
+5. Reconcile or set up `AGENTS.md` and `PM/` project management structure per the profile guidelines.
+6. Once implementation and acceptance verification are complete, delete the `.scratch-toolkit` directory.</code></pre>
+            </div>
+            <p id="copyNotice" class="copy-notice" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- Core Features Panel -->
+        <section class="panel reveal delay-1">
+            <h2>Why Project Toolkit?</h2>
+            <div class="features-list">
+                <div class="feature-item">
+                    <span class="feature-icon">🤖</span>
+                    <div>
+                        <h3>Documentation as Executable Rules</h3>
+                        <p>Instead of stale templates or rigid shared scripts, project profiles define architectural requirements. AI agents generate fresh, idiomatic code tailored specifically to your project's constraints.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🧹</span>
+                    <div>
+                        <h3>Zero Repository Clutter</h3>
+                        <p>The toolkit is shallow-cloned temporarily into a <code>.scratch-toolkit/</code> directory during setup and deleted immediately upon completion. Nothing remains in your repo except a 5-line origin breadcrumb header.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">📋</span>
+                    <div>
+                        <h3>AI-Driven Project Management</h3>
+                        <p>Built-in <code>PM/</code> conventions (<code>backlog</code> &rarr; <code>current</code> &rarr; <code>release-candidate-dev</code> &rarr; <code>release-candidate</code> &rarr; <code>completed</code>) keep AI sessions strictly aligned with current priorities without status drift.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <span class="feature-icon">🚀</span>
+                    <div>
+                        <h3>Dual-Lane Release Architecture</h3>
+                        <p>Strict dev and production lane isolation ensures dev builds never leak pre-production code or dev subdomains into live releases.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supported Profiles -->
+        <section class="panel reveal delay-2">
+            <h2>Supported Profiles</h2>
+            <div class="profiles-grid">
+                <div class="profile-card">
+                    <span class="profile-badge">.NET</span>
+                    <h3>dotnet-windows-desktop</h3>
+                    <p>Multi-project .NET solution with desktop host, ASP.NET Core API, Web frontend, Inno Setup installer, SHA256 checksums, and update manifest polling.</p>
+                </div>
+
+                <div class="profile-card">
+                    <span class="profile-badge">Web / PWA</span>
+                    <h3>vanilla-js-github-pages-spa</h3>
+                    <p>Vanilla JS Single Page Application hosted on GitHub Pages with service worker caching, dual-repo dev/live deployment, and timestamp versioning.</p>
+                </div>
+
+                <div class="profile-card">
+                    <span class="profile-badge">PM Only</span>
+                    <h3>project-management-only</h3>
+                    <p>Adopt the AI-driven <code>PM/</code> folder structure and <code>AGENTS.md</code> direction rules into an existing codebase with established CI/CD pipelines.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div>
+            <p>&copy; 2026 Ignyos Open Source. Released under the MIT License.</p>
+        </div>
+        <div>
+            <a href="https://github.com/Ignyos/project-toolkit" class="footer-link" target="_blank" rel="noopener">GitHub Repository &rarr;</a>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('copyPromptButton')?.addEventListener('click', async () => {
+            const prompt = document.getElementById('promptText')?.innerText;
+            const notice = document.getElementById('copyNotice');
+            const button = document.getElementById('copyPromptButton');
+            if (!prompt) return;
+
+            try {
+                await navigator.clipboard.writeText(prompt);
+                if (notice) notice.innerText = 'Prompt copied to clipboard!';
+                if (button) button.innerText = 'Copied!';
+                setTimeout(() => {
+                    if (notice) notice.innerText = '';
+                    if (button) button.innerText = 'Copy Prompt';
+                }, 3000);
+            } catch (err) {
+                if (notice) notice.innerText = 'Please copy manually.';
+            }
+        });
+    </script>
+</body>
+</html>
