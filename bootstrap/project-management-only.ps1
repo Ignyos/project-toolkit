@@ -46,6 +46,7 @@ if ($ProjectMode -eq 'greenfield') {
     Write-Host "  - Create PM/ structure (project-management.md, workflow.md, backlog/, current/, release-candidate-dev/, release-candidate/, completed/)."
     Write-Host "  - Migrate any existing roadmap or task checklists into appropriate PM/ lifecycle directories."
 }
+Write-Host "  - Carry the completion-confirmation gate from shared/project-management/workflow.md into PM/workflow.md verbatim: items are never marked complete on AI judgment alone."
 Write-Host ""
 
 Wait-ForStep "Press ENTER after AI Assistant completes Step 1..."
