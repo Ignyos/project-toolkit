@@ -35,8 +35,8 @@
 
 Follow these steps:
 1. Run `git clone --depth 1 https://github.com/Ignyos/project-toolkit .scratch-toolkit` in the terminal to shallow-clone the toolkit.
-2. Run `.\.scratch-toolkit\bootstrap.ps1` in PowerShell to begin the interactive interview (choose Full Profile or Project Management Only, then Greenfield or Existing).
-3. Follow the directives output by the bootstrap script and profile documents (`architecture.md`, `requirements.md`, `implementation-steps.md`, `acceptance-checklist.md`).
+2. Run `.\.scratch-toolkit\bootstrap.ps1` in PowerShell. Answer the interview prompts (choose Full Profile or Project Management Only, then Greenfield or Existing). Ask me to decide if you are unsure.
+3. The script prints numbered AI ASSISTANT DIRECTIVES and then exits. Those directives are YOUR task list: read the listed context files and carry out every directive yourself. Do not wait for the script to prompt you again.
 4. Apply origin breadcrumbs per `shared/breadcrumb-spec.md` to generated files.
 5. Reconcile or set up `AGENTS.md` and `PM/` project management structure per the profile guidelines.
 6. Once implementation and acceptance verification are complete, delete the `.scratch-toolkit` directory.</code></pre>

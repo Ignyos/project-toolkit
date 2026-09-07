@@ -1,7 +1,11 @@
 [CmdletBinding()]
 param(
     [string]$ProjectMode, # 'greenfield' or 'existing'
-    [string]$ProfileName
+    [string]$ProfileName,
+
+    # Pause between directives for a human operator. AI agents should leave this off
+    # so the script emits every directive and exits instead of blocking on input.
+    [switch]$Interactive
 )
 
 Set-StrictMode -Version Latest
@@ -106,4 +110,4 @@ if (-not (Test-Path -LiteralPath $profileScript)) {
 Write-Host "Dispatching to $profileScript ..." -ForegroundColor Cyan
 Write-Host ""
 
-& $profileScript -ProjectMode $ProjectMode -ToolkitRoot $scriptDir
+& $profileScript -ProjectMode $ProjectMode -ToolkitRoot $scriptDir -Interactive:$Interactive

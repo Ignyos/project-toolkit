@@ -4,11 +4,20 @@ param(
     [string]$ProjectMode,
 
     [Parameter(Mandatory = $true)]
-    [string]$ToolkitRoot
+    [string]$ToolkitRoot,
+
+    [string]$NewProfileName,
+
+    [switch]$Interactive
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Wait-ForStep {
+    param([string]$Message)
+    if ($Interactive) { Read-Host $Message | Out-Null }
+}
 
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 Write-Host " Action: Create a New Profile" -ForegroundColor Cyan
@@ -16,8 +25,10 @@ Write-Host "----------------------------------------" -ForegroundColor Cyan
 Write-Host ""
 
 # Prompt for the new profile folder name
-$newProfileName = Read-Host "Enter new profile folder name (e.g., python-fastapi-service, node-react-spa)"
-$newProfileName = $newProfileName.ToLower().Trim() -replace '[^a-z0-9\-]', ''
+if ([string]::IsNullOrWhiteSpace($NewProfileName)) {
+    $NewProfileName = Read-Host "Enter new profile folder name (e.g., python-fastapi-service, node-react-spa)"
+}
+$newProfileName = $NewProfileName.ToLower().Trim() -replace '[^a-z0-9\-]', ''
 
 if ([string]::IsNullOrWhiteSpace($newProfileName)) {
     throw "Invalid profile name provided."
@@ -55,7 +66,7 @@ Write-Host "  7. Copy real working scripts/workflows into $targetProfileDir\refe
 Write-Host "  8. Create $targetBootstrapScript using the standard 4-directive AI hand-off loop pattern."
 Write-Host ""
 
-Read-Host "Press ENTER after AI Assistant creates the new profile files..."
+Wait-ForStep "Press ENTER after AI Assistant creates the new profile files..."
 
 Write-Host ""
 Write-Host "================================================================================" -ForegroundColor Yellow
@@ -80,7 +91,7 @@ Write-Host "    [3] Skip Remote Push & Proceed Locally:" -ForegroundColor Gray
 Write-Host "        Keep committed locally in .scratch-toolkit and proceed to bootstrap target project" -ForegroundColor Gray
 Write-Host ""
 
-Read-Host "Press ENTER after AI Assistant completes Step 2..."
+Wait-ForStep "Press ENTER after AI Assistant completes Step 2..."
 
 Write-Host ""
 Write-Host "================================================================================" -ForegroundColor Yellow
