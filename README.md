@@ -84,4 +84,5 @@ If an existing or greenfield project does not fit any existing profile in `profi
 - `shared/` — Cross-cutting conventions.
   - `breadcrumb-spec.md` — Comment header format for generated files.
   - `ai-direction-guidance.md` — Guidance for setting up `AGENTS.md` and Copilot instructions.
-  - `project-management/` — Standard `PM/` folder structure and workflow rules.
+  - `project-management/` — Standard `PM/` folder structure and workflow rules, plus an optional
+    `branching.md` add-on for advisory branch-discipline rules.

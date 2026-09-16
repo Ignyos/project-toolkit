@@ -6,7 +6,9 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ToolkitRoot,
 
-    [switch]$Interactive
+    [switch]$Interactive,
+
+    [switch]$EnableBranching
 )
 
 Set-StrictMode -Version Latest
@@ -35,6 +37,9 @@ Write-Host "Context files to read:" -ForegroundColor Gray
 Write-Host "  1. $ToolkitRoot\shared\ai-direction-guidance.md" -ForegroundColor Gray
 Write-Host "  2. $ToolkitRoot\shared\project-management\workflow.md" -ForegroundColor Gray
 Write-Host "  3. $ToolkitRoot\shared\project-management\project-management.md" -ForegroundColor Gray
+if ($EnableBranching) {
+    Write-Host "  4. $ToolkitRoot\shared\project-management\branching.md" -ForegroundColor Gray
+}
 Write-Host ""
 Write-Host "Directives:" -ForegroundColor White
 if ($ProjectMode -eq 'greenfield') {
@@ -47,6 +52,9 @@ if ($ProjectMode -eq 'greenfield') {
     Write-Host "  - Migrate any existing roadmap or task checklists into appropriate PM/ lifecycle directories."
 }
 Write-Host "  - Carry the completion-confirmation gate from shared/project-management/workflow.md into PM/workflow.md verbatim: items are never marked complete on AI judgment alone."
+if ($EnableBranching) {
+    Write-Host "  - Copy branching.md into PM/branching.md, add its breadcrumb, and add a 'Branching Policy: enabled, see PM/branching.md' pointer line next to the PM/workflow.md pointer in AGENTS.md / copilot-instructions.md."
+}
 Write-Host ""
 
 Wait-ForStep "Press ENTER after AI Assistant completes Step 1..."

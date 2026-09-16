@@ -5,11 +5,19 @@ param(
 
     # Pause between directives for a human operator. AI agents should leave this off
     # so the script emits every directive and exits instead of blocking on input.
-    [switch]$Interactive
+    [switch]$Interactive,
+
+    # Opt-in to advisory PM branch-discipline rules (shared/project-management/branching.md).
+    [switch]$EnableBranching
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+# Capture before the interview logic below mutates them, so we can tell a fully-parameterized
+# (silent) invocation apart from one that's already blocking on interactive prompts.
+$wasProjectModeProvided = -not [string]::IsNullOrWhiteSpace($ProjectMode)
+$wasProfileNameProvided = -not [string]::IsNullOrWhiteSpace($ProfileName)
 
 $scriptDir = Split-Path -Parent $PSCommandPath
 $profilesDir = Join-Path $scriptDir 'profiles'
@@ -62,6 +70,25 @@ if ([string]::IsNullOrWhiteSpace($ProjectMode)) {
 Write-Host "Project Mode: $ProjectMode" -ForegroundColor Green
 Write-Host ""
 
+# 2b. Prompt for optional PM branch-discipline guidance if not provided via parameter.
+# Skip the prompt for a fully-parameterized (silent) invocation — ProjectMode and ProfileName
+# were both supplied up front, so this run isn't going through the interactive interview and
+# must not block on a new Read-Host. EnableBranching stays disabled unless explicitly passed.
+if (-not $PSBoundParameters.ContainsKey('EnableBranching')) {
+    if ($wasProjectModeProvided -and $wasProfileNameProvided) {
+        $EnableBranching = $false
+    } else {
+        Write-Host "Enable optional PM branch-discipline guidance?" -ForegroundColor Yellow
+        Write-Host "  Adds PM/branching.md: advisory rules keeping PM housekeeping commits on dev" -ForegroundColor Gray
+        Write-Host "  and code changes on per-item working branches. See shared/project-management/branching.md." -ForegroundColor Gray
+        $branchChoice = Read-Host "Enable? [y/N]"
+        $EnableBranching = $branchChoice -match '^(y|yes)$'
+    }
+}
+
+Write-Host "Branch-Discipline Guidance: $(if ($EnableBranching) { 'enabled' } else { 'disabled' })" -ForegroundColor Green
+Write-Host ""
+
 # 3. Prompt for Profile Selection if not PM-only and not provided via parameter
 if ($ProfileName -ne 'project-management-only' -and ([string]::IsNullOrWhiteSpace($ProfileName) -or ($availableProfiles -notcontains $ProfileName -and $ProfileName -ne 'create-new-profile'))) {
     Write-Host "Select Profile:" -ForegroundColor Yellow
@@ -110,4 +137,4 @@ if (-not (Test-Path -LiteralPath $profileScript)) {
 Write-Host "Dispatching to $profileScript ..." -ForegroundColor Cyan
 Write-Host ""
 
-& $profileScript -ProjectMode $ProjectMode -ToolkitRoot $scriptDir -Interactive:$Interactive
+& $profileScript -ProjectMode $ProjectMode -ToolkitRoot $scriptDir -Interactive:$Interactive -EnableBranching:$EnableBranching

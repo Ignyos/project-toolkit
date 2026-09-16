@@ -24,3 +24,15 @@ When adopting the toolkit in an existing project:
 2. **Preserve existing project context.** Do not overwrite existing status, architectural notes, or custom project rules.
 3. **Append / Merge profile direction rules.** Add the pointer to `PM/workflow.md` and any profile-specific constraints (e.g., version source of truth rules or dual-lane publishing requirements).
 4. Verify that the reconciled file does not contain contradictory guidance or duplicate sections.
+
+## Optional: Branch-Discipline Guidance
+
+`shared/project-management/branching.md` is an opt-in module layered on top of `workflow.md`. It
+is offered as a developer choice during bootstrap (greenfield or existing), never assumed:
+
+1. If the developer opts in, copy `branching.md` into `PM/branching.md` in the target project and
+   apply the origin breadcrumb per `shared/breadcrumb-spec.md`.
+2. Add a `Branching Policy: enabled, see PM/branching.md` pointer line next to the existing
+   `PM/workflow.md` pointer sentence in `AGENTS.md` / `.github/copilot-instructions.md`.
+3. If the developer declines, do not create `PM/branching.md` and do not add the pointer line.
+   Absence of the file means the rules do not apply.
