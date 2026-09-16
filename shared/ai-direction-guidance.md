@@ -6,12 +6,30 @@ This document defines how the bootstrapping process sets up or reconciles AI dir
 
 Repository documentation and AI direction files are the source of truth for project direction, status, and AI assistant behavior. AI assistants must rely on checked-in documentation rather than memory or stale context.
 
+Each fact has exactly one owning file; every other file references it instead of restating it:
+
+- The active/current PM item is owned by `PM/project-management.md`'s `current/` index (backed by
+  the lifecycle folders). `AGENTS.md` / `.github/copilot-instructions.md` never name the current
+  item directly (for example "the active work is `feat-001`") — that value changes independently
+  of AI direction files and goes stale the moment it does.
+- Product priority, direction, and broad completion status are owned by the project's own roadmap
+  or status doc, if one exists (for example `docs/product-roadmap.md`). `AGENTS.md` does not
+  restate that detail wholesale.
+- `AGENTS.md` / `.github/copilot-instructions.md` own instructions for *how* to read and reconcile
+  the files above, plus durable direction rules that don't change per item — they point at the
+  owning files rather than duplicating their content. Prefer phrasing such as "the active item is
+  whatever `PM/project-management.md` lists under `current/`, interpreted per the priorities in
+  [roadmap doc]" over hardcoding an item id or status line.
+- If `AGENTS.md` and an owning file disagree, the owning file wins. Fix the disagreement by making
+  the `AGENTS.md` line a pointer, not by copying the owning file's current value into it.
+
 ## Greenfield Project Setup
 
 When bootstrapping a new project:
 
 1. Create `AGENTS.md` at the project root with:
-   - Project purpose and canonical project status.
+   - Project purpose and a pointer to where canonical status lives (per the ownership rules above)
+     — not a restated copy of the active item id or roadmap detail.
    - Required workflow rules (e.g. read status before answering roadmap questions).
    - Pointer sentence to `PM/workflow.md` for project management lifecycle rules.
 2. Create `.github/copilot-instructions.md` with repository-specific Copilot instructions aligned with `AGENTS.md`.
