@@ -33,6 +33,30 @@ actually performed — it is never sized to reduce how often the developer is as
 - Only items the slice actually touched appear in the list. Unrelated in-flight items are not
   bundled in to ride along on the same approval.
 
+## Resuming a stale or ambiguous item
+
+An item can look unfinished in `PM/` for two very different reasons: the code work genuinely isn't
+done, or the code work is done and only a checklist entry or confirmation gate hasn't caught up.
+Resuming work on an item must not assume the first without checking.
+
+- Before resuming coding, verification, or building on an item (including checking out its
+  existing working branch), re-read its acceptance criteria and ask the developer whether the
+  implementation is already believed complete, independent of what the item file currently says.
+- If the developer believes the implementation is complete while criteria remain unchecked, do not
+  silently keep working those criteria as originally scoped. Ask which applies, then act on the
+  answer:
+  1. The criterion is still required as-written — get explicit authorization for one bounded
+     verification path (see Verification scope discipline below), then run the
+     completion-confirmation gate.
+  2. The criterion should be revised, deferred, or dropped — update the item file to say so and
+     record why, then run the completion-confirmation gate against the item as revised.
+- An item's working branch existing, or being checked out again, is not itself a signal that the
+  item is still active work. A completed item can keep its branch around until merge/cleanup;
+  resuming that branch is maintenance, not automatic continuation of the original item.
+- "The item is still in `current/`" or "the branch still exists" is never sufficient reason on its
+  own to keep expanding verification work. Reconcile the item's actual status first; only then
+  decide whether further work is warranted.
+
 ## Verification scope discipline
 
 An item's existing acceptance criteria define what "done" means. Verifying that criteria stays

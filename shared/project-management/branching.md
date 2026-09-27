@@ -96,7 +96,9 @@ switching branches with unsaved work in place. Advisory.
 
 Trigger: Rule 3 applies, but a branch named after the item id already exists locally or on the
 remote (for example, from a prior session). Suggest checking out the existing branch instead of
-creating a new or conflicting one. Advisory.
+creating a new or conflicting one. Before resuming any coding or verification on it, first
+reconcile the item's actual completion status per `workflow.md`'s "Resuming a stale or ambiguous
+item" — the branch existing is not proof the item is still unfinished. Advisory.
 
 ## Rule 12 — One branch spanning multiple items
 
