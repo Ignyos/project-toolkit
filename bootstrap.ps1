@@ -2,13 +2,21 @@
 param(
     [string]$ProjectMode, # 'greenfield' or 'existing'
     [string]$ProfileName,
+    [ValidateSet('solo', 'team')]
+    [string]$OperatingMode,
 
     # Pause between directives for a human operator. AI agents should leave this off
     # so the script emits every directive and exits instead of blocking on input.
     [switch]$Interactive,
 
     # Opt-in to advisory PM branch-discipline rules (shared/project-management/branching.md).
-    [switch]$EnableBranching
+    [switch]$EnableBranching,
+
+    # Opt-in to separate, per-item deployment candidate checkpoints.
+    [switch]$EnableDeploymentCheckpoints,
+
+    # Opt-in to persistent per-item verification notes.
+    [switch]$EnableEvidencePolicy
 )
 
 Set-StrictMode -Version Latest
@@ -18,6 +26,7 @@ $ErrorActionPreference = 'Stop'
 # (silent) invocation apart from one that's already blocking on interactive prompts.
 $wasProjectModeProvided = -not [string]::IsNullOrWhiteSpace($ProjectMode)
 $wasProfileNameProvided = -not [string]::IsNullOrWhiteSpace($ProfileName)
+$wasProfileSelectionProvided = $wasProjectModeProvided -and $wasProfileNameProvided
 
 $scriptDir = Split-Path -Parent $PSCommandPath
 $profilesDir = Join-Path $scriptDir 'profiles'
@@ -70,23 +79,61 @@ if ([string]::IsNullOrWhiteSpace($ProjectMode)) {
 Write-Host "Project Mode: $ProjectMode" -ForegroundColor Green
 Write-Host ""
 
-# 2b. Prompt for optional PM branch-discipline guidance if not provided via parameter.
-# Skip the prompt for a fully-parameterized (silent) invocation — ProjectMode and ProfileName
-# were both supplied up front, so this run isn't going through the interactive interview and
-# must not block on a new Read-Host. EnableBranching stays disabled unless explicitly passed.
+# Operating mode is independent of the selected technology profile.
+if ([string]::IsNullOrWhiteSpace($OperatingMode)) {
+    if ($wasProfileSelectionProvided) {
+        $OperatingMode = 'solo'
+    } else {
+        Write-Host "Select Operating Mode (independent of project technology):" -ForegroundColor Yellow
+        Write-Host "  [1] Solo  (lean work tracking; optional coordination controls)"
+        Write-Host "  [2] Team  (handoffs and roles; coordination controls remain optional)"
+        $operatingChoice = Read-Host "Choice [1 or 2; default 1]"
+        if ([string]::IsNullOrWhiteSpace($operatingChoice)) {
+            $operatingChoice = '1'
+        }
+        while ($operatingChoice -ne '1' -and $operatingChoice -ne '2') {
+            $operatingChoice = Read-Host "Please enter 1 for Solo or 2 for Team"
+        }
+        $OperatingMode = if ($operatingChoice -eq '1') { 'solo' } else { 'team' }
+    }
+} else {
+    $OperatingMode = $OperatingMode.ToLower().Trim()
+}
+
+# Optional coordination modules default off in both modes. Team mode does not imply
+# that every coordination control is required.
 if (-not $PSBoundParameters.ContainsKey('EnableBranching')) {
-    if ($wasProjectModeProvided -and $wasProfileNameProvided) {
+    if ($wasProfileSelectionProvided) {
         $EnableBranching = $false
     } else {
-        Write-Host "Enable optional PM branch-discipline guidance?" -ForegroundColor Yellow
-        Write-Host "  Adds PM/branching.md: advisory rules keeping PM housekeeping commits on dev" -ForegroundColor Gray
-        Write-Host "  and code changes on per-item working branches. See shared/project-management/branching.md." -ForegroundColor Gray
+        Write-Host "Enable optional branch-discipline guidance?" -ForegroundColor Yellow
         $branchChoice = Read-Host "Enable? [y/N]"
         $EnableBranching = $branchChoice -match '^(y|yes)$'
     }
 }
+if (-not $PSBoundParameters.ContainsKey('EnableDeploymentCheckpoints')) {
+    if ($wasProfileSelectionProvided) {
+        $EnableDeploymentCheckpoints = $false
+    } else {
+        Write-Host "Enable separate per-item deployment candidate checkpoints?" -ForegroundColor Yellow
+        $deploymentChoice = Read-Host "Enable? [y/N]"
+        $EnableDeploymentCheckpoints = $deploymentChoice -match '^(y|yes)$'
+    }
+}
+if (-not $PSBoundParameters.ContainsKey('EnableEvidencePolicy')) {
+    if ($wasProfileSelectionProvided) {
+        $EnableEvidencePolicy = $false
+    } else {
+        Write-Host "Enable persistent per-item verification evidence?" -ForegroundColor Yellow
+        $evidenceChoice = Read-Host "Enable? [y/N]"
+        $EnableEvidencePolicy = $evidenceChoice -match '^(y|yes)$'
+    }
+}
 
+Write-Host "Operating Mode: $OperatingMode" -ForegroundColor Green
 Write-Host "Branch-Discipline Guidance: $(if ($EnableBranching) { 'enabled' } else { 'disabled' })" -ForegroundColor Green
+Write-Host "Deployment Checkpoints: $(if ($EnableDeploymentCheckpoints) { 'enabled' } else { 'disabled' })" -ForegroundColor Green
+Write-Host "Per-Item Evidence Policy: $(if ($EnableEvidencePolicy) { 'enabled' } else { 'disabled' })" -ForegroundColor Green
 Write-Host ""
 
 # 3. Prompt for Profile Selection if not PM-only and not provided via parameter
@@ -137,4 +184,4 @@ if (-not (Test-Path -LiteralPath $profileScript)) {
 Write-Host "Dispatching to $profileScript ..." -ForegroundColor Cyan
 Write-Host ""
 
-& $profileScript -ProjectMode $ProjectMode -ToolkitRoot $scriptDir -Interactive:$Interactive -EnableBranching:$EnableBranching
+& $profileScript -ProjectMode $ProjectMode -ToolkitRoot $scriptDir -OperatingMode $OperatingMode -Interactive:$Interactive -EnableBranching:$EnableBranching -EnableDeploymentCheckpoints:$EnableDeploymentCheckpoints -EnableEvidencePolicy:$EnableEvidencePolicy

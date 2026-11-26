@@ -11,8 +11,8 @@ This directory contains real, working scripts from the LAN Portal repository as 
 
 ## Included Reference Files
 
-- `publish-live.ps1` — Production release publishing script (branch gating, version validation, diff generation, release notes prompt/confirmation, tagging, and pushing).
-- `publish-dev.ps1` — Developer publish script (fast dev-branch publishing, non-zero fourth version node suggestion, optional release notes).
+- `publish-live.ps1` — Production release publishing script (branch gating, version validation, diff generation, concise release-notes handoff, one final default-No deployment authorization, tagging, and pushing).
+- `publish-dev.ps1` — Developer publish script (fast dev-branch publishing, non-zero fourth version node suggestion, and one final default-No deployment authorization; release notes remain optional).
 - `release-common.ps1` — Common helper functions (git command wrapper, semver parsing, path resolution, changed paths calculation).
 - `validate-publish-parity.ps1` — Parity and safeguard validation script (verifies gates, functions, and contract invariants).
 - `build-dev-installer.ps1` — Developer installer build script (packages published Host/API/Web outputs, generates Inno Setup installer and SHA256 checksums).

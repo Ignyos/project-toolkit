@@ -8,7 +8,6 @@ param(
     [string]$ReleaseNotesStyleGuidePath = ".github/release/release-notes-style-guide.md",
     [string]$TagPrefix = "v",
     [string]$PublishVersion,
-    [switch]$ConfirmVersion,
     [switch]$ContinueAfterReleaseNotes,
     [switch]$ApprovePublish
 )
@@ -171,25 +170,6 @@ if ([int]$targetVersionParts[3] -ne 0) {
     Exit-WithError -Code $ExitCodes.VersionValidationFailed -Message "Live publish version '$targetVersion' must end in .0 for production lane identity."
 }
 
-if ($ConfirmVersion -or $DryRun) {
-    if ($DryRun -and -not $ConfirmVersion) {
-        Write-Log "DryRun mode: auto-confirming version $targetVersion"
-    }
-    else {
-        Write-Log "Version confirmation override enabled via -ConfirmVersion for $targetVersion"
-    }
-}
-elseif ($NonInteractive) {
-    Exit-WithError -Code $ExitCodes.UserCancelled -Message "NonInteractive mode requires -ConfirmVersion for non-dry-run publishes."
-}
-else {
-    $confirmVersionResponse = Read-Host "Publish version $targetVersion? [y/N]"
-    if ($confirmVersionResponse -notin @("y", "Y", "yes", "YES")) {
-        Write-Log -Level "WARN" -Message "User cancelled at version confirmation step."
-        exit $ExitCodes.UserCancelled
-    }
-}
-
 $tagName = "$TagPrefix$targetVersion"
 
 $localTagExists = Invoke-Git -GitArgs @("show-ref", "--tags", "--verify", "--quiet", "refs/tags/$tagName") -AllowFailure
@@ -327,9 +307,9 @@ elseif ($NonInteractive) {
     Exit-WithError -Code $ExitCodes.UserCancelled -Message "NonInteractive mode requires -ContinueAfterReleaseNotes for non-dry-run publishes."
 }
 else {
-    $continueChoice = Read-Host "Type CONTINUE to proceed after AI finishes, or EXIT to cancel"
-    if ($continueChoice -notin @("CONTINUE", "continue")) {
-        Write-Log -Level "WARN" -Message "User exited before publish."
+    $continueChoice = Read-Host "Are release notes ready? [y/N]"
+    if ($continueChoice -notmatch "^(?i:y|yes)$") {
+        Write-Log -Level "WARN" -Message "Release-notes handoff cancelled. No commit, tag, or push was performed; generated diff and prompt artifacts remain for review."
         exit $ExitCodes.UserCancelled
     }
 }
@@ -367,9 +347,9 @@ elseif ($NonInteractive) {
     Exit-WithError -Code $ExitCodes.UserCancelled -Message "NonInteractive mode requires -ApprovePublish for non-dry-run publishes."
 }
 else {
-    $approval = Read-Host "Proceed with commit, tag, and push? [y/N]"
-    if ($approval -notin @("y", "Y", "yes", "YES")) {
-        Write-Log -Level "WARN" -Message "User cancelled at final approval."
+    $approval = Read-Host "Authorize production commit, tag, and push for $tagName? [y/N]"
+    if ($approval -notmatch "^(?i:y|yes)$") {
+        Write-Log -Level "WARN" -Message "Publish authorization declined. No commit, tag, or push was performed; generated release artifacts remain for review."
         exit $ExitCodes.UserCancelled
     }
 }

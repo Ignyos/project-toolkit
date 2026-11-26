@@ -1,19 +1,19 @@
 # Project Management Index
 
-> **Notice**: See `AGENTS.md` for current direction and priorities. This file is a live index of in-flight work only.
+> **Notice**: See `AGENTS.md` for current direction and priorities. This file is an index, not a
+> second copy of item status or workflow rules.
 
-## In-Flight Work
+## Work
 
-### Current Sprint / Active Work (`current/`)
+- [Backlog](backlog/) — Prioritized work waiting to start.
+- [Current](current/) — Work in progress.
+- [Completed](completed/) — Implemented, validated, and accepted work.
 
-- [Active items listed here]
+The default work lifecycle is `backlog/` -> `current/` -> `completed/`. Completion is independent
+of deployment. Tailor this index to the selected operating mode and only add deployment indexes
+when the optional deployment-checkpoint module is enabled.
 
-### Release Candidates — Production (`release-candidate/`)
+## Optional indexes
 
-- [Pre-vetted items confirmed for next production release listed here]
-
-## Life-Cycle Categories
-
-- [Backlog](backlog/) — Prioritized items waiting to be started.
-- [Release Candidates — Dev](release-candidate-dev/) — Items merged and riding on dev deploys, awaiting dev-deploy checkpoint verification.
-- [Completed Releases](completed/) — Items shipped in the most recent production release.
+- Deployment candidate lists, if enabled, are separate from work status and live under
+  `deployments/`.

@@ -4,7 +4,6 @@ param(
     [string]$DevBranch = "dev",
     [string]$VersionProjectPath = "Ignyos.LanPortal.Host/Ignyos.LanPortal.Host.csproj",
     [string]$PublishVersion,
-    [switch]$ConfirmVersion,
     [switch]$ApprovePublish
 )
 
@@ -155,25 +154,6 @@ if ([int]$targetVersionParts[3] -le 0) {
     Exit-WithError -Code $ExitCodes.VersionValidationFailed -Message "Dev publish version '$targetVersion' must use a non-zero fourth node."
 }
 
-if ($ConfirmVersion -or $DryRun) {
-    if ($DryRun -and -not $ConfirmVersion) {
-        Write-Log "DryRun mode: auto-confirming dev version $targetVersion"
-    }
-    else {
-        Write-Log "Version confirmation override enabled via -ConfirmVersion for $targetVersion"
-    }
-}
-elseif ($NonInteractive) {
-    Exit-WithError -Code $ExitCodes.UserCancelled -Message "NonInteractive mode requires -ConfirmVersion for non-dry-run publishes."
-}
-else {
-    $confirmVersionResponse = Read-Host "Publish dev version $targetVersion? [y/N]"
-    if ($confirmVersionResponse -notin @("y", "Y", "yes", "YES")) {
-        Write-Log -Level "WARN" -Message "User cancelled at version confirmation step."
-        exit $ExitCodes.UserCancelled
-    }
-}
-
 Write-Log "Release notes are optional for the dev lane; skipping release-notes gate."
 
 if ($DryRun) {
@@ -188,8 +168,8 @@ elseif ($NonInteractive) {
     Exit-WithError -Code $ExitCodes.UserCancelled -Message "NonInteractive mode requires -ApprovePublish for non-dry-run publishes."
 }
 else {
-    $approval = Read-Host "Proceed with dev commit and push? [y/N]"
-    if ($approval -notin @("y", "Y", "yes", "YES")) {
+    $approval = Read-Host "Authorize dev commit and push of version $targetVersion? [y/N]"
+    if ($approval -notmatch "^(?i:y|yes)$") {
         Write-Log -Level "WARN" -Message "User cancelled at final approval."
         exit $ExitCodes.UserCancelled
     }
