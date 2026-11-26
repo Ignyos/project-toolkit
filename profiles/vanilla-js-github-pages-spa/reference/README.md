@@ -13,8 +13,8 @@ This directory contains real, working scripts and workflows from the KAP (Kitche
 ## Included Reference Files
 
 - `build.ps1` — Validation script verifying that the deployment source directory (`docs/`) exists and is ready for deployment.
-- `dev-publish.ps1` — Developer publish script (enforces dev branch, updates asset query strings `?v=<timestamp>` and service worker cache name, commits, and pushes to origin `dev`).
-- `release.ps1` — Production release script (enforces `main` branch, updates asset query strings, writes production CNAME, generates release diff in `release/rel-<timestamp>.txt`, builds AI release notes prompt, pauses for human/AI round-trip, commits, tags, and pushes).
+- `dev-publish.ps1` — Developer publish script (enforces dev branch and a clean tree, asks once for default-No authorization, updates asset query strings `?v=<timestamp>` and service worker cache name, commits, and optionally pushes to origin `dev`).
+- `release.ps1` — Production release script (enforces `main` branch and a clean tree, updates asset query strings, writes production CNAME, generates release diff in `release/rel-<timestamp>.txt`, builds AI release notes prompt with clipboard fallback, then requires explicit default-No authorization before committing, tagging, and pushing).
 - `clean.ps1` — Utility script to clean the `docs/` deployment output directory.
 - `RELEASE_NOTES_STYLE.md` — Style guide governing release notes tone, formatting, and section structure.
 - `.vscode/launch.json` — Sample VS Code Run & Debug configurations for static SPA scripts.

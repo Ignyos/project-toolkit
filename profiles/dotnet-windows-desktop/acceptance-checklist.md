@@ -14,6 +14,7 @@ Walk through this checklist after generating or refactoring a project implementa
 - [ ] Verify `Publish-live` is blocked when run on any branch other than `main` (or runs strictly in dry-run/test mode).
 - [ ] Verify `Publish-dev` is blocked when run on any branch other than `dev`.
 - [ ] Confirm both scripts verify a clean working tree before performing irreversible operations.
+- [ ] Confirm each publish script uses one final default-No authorization for its named deployment and does not change PM state.
 
 ## 3. Release Notes & AI Gate
 - [ ] Verify `Publish-live` clears and requires release notes confirmation before tagging and pushing.
@@ -34,9 +35,12 @@ Walk through this checklist after generating or refactoring a project implementa
 - [ ] Verify `.github/workflows/` contains release packaging and dev publish workflows.
 
 ## 7. Project Management Integration
-- [ ] Verify `PM/` structure exists with `project-management.md`, `workflow.md`, and all lifecycle folders.
+- [ ] Verify `PM/workflow.md` records the selected Solo or Team mode and uses `backlog/`, `current/`, and `completed/`.
+- [ ] Verify `completed/` means implemented, validated, and human-accepted, independently of deployment.
+- [ ] Verify bootstrap records the accountable owner, acceptance authority, and deployment authority.
 - [ ] Confirm `project-management.md` acts as an index without duplicating status prose.
-- [ ] Confirm `AGENTS.md` contains a pointer sentence to `PM/workflow.md`.
+- [ ] Confirm `AGENTS.md` identifies the selected PM mode and points to `PM/workflow.md`.
+- [ ] Verify selected optional PM modules are configured and publishing does not change PM state; preserve or explicitly retire any pre-existing unselected module.
 
 ## 8. Breadcrumb Header
 - [ ] Verify every generated script and workflow file contains the origin breadcrumb comment header defined in `shared/breadcrumb-spec.md`.

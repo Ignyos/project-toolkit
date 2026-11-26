@@ -16,12 +16,15 @@ Walk through this checklist after generating or refactoring a project implementa
 
 ## 3. Branch Gating & Release Safeguards
 - [ ] Verify `dev-publish.ps1` is blocked when run on any branch other than `dev`.
+- [ ] Verify `dev-publish.ps1` blocks a dirty working tree and asks once for default-No deployment authorization before making changes.
 - [ ] Verify `release.ps1` is blocked from committing, tagging, or pushing when run on any branch other than `main` (runs test mode only).
 - [ ] Verify `release.ps1` checks for a clean working tree before initiating a release.
+- [ ] Verify release/publish scripts do not edit or promote PM items.
 
 ## 4. Diff Auditing & Release Notes
 - [ ] Verify `release.ps1` generates a diff file in `release/rel-<timestamp>.txt`.
-- [ ] Verify `release.ps1` requires AI/human release notes creation and user confirmation before tagging.
+- [ ] Verify `release.ps1` provides a manual fallback if the release-notes prompt cannot be copied to the clipboard.
+- [ ] Verify `release.ps1` uses concise default-No readiness and final deployment authorization prompts before release actions.
 - [ ] Verify `release.yml` GitHub Actions workflow attaches `RELEASE_NOTES.md` to the GitHub Release on tag push.
 
 ## 5. Developer Preview Banner
@@ -33,9 +36,12 @@ Walk through this checklist after generating or refactoring a project implementa
 - [ ] On existing projects, confirm `.vscode/launch.json` merged new tasks without clobbering existing custom debug configurations.
 
 ## 7. Project Management Integration
-- [ ] Verify `PM/` structure exists with `project-management.md`, `workflow.md`, and all lifecycle folders.
+- [ ] Verify `PM/workflow.md` records the selected Solo or Team mode and uses `backlog/`, `current/`, and `completed/`.
+- [ ] Verify `completed/` means implemented, validated, and human-accepted, independently of deployment.
+- [ ] Verify bootstrap records the accountable owner, acceptance authority, and deployment authority.
 - [ ] Confirm `project-management.md` acts as an index without duplicating status prose.
-- [ ] Confirm `AGENTS.md` contains a pointer sentence to `PM/workflow.md`.
+- [ ] Confirm `AGENTS.md` identifies the selected PM mode and points to `PM/workflow.md`.
+- [ ] Verify selected optional PM modules are configured and publishing does not change PM state; preserve or explicitly retire any pre-existing unselected module.
 
 ## 8. Breadcrumb Header
 - [ ] Verify every generated script, workflow, and markdown file contains the origin breadcrumb comment header defined in `shared/breadcrumb-spec.md`.

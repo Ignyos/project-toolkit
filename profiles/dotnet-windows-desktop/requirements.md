@@ -23,3 +23,9 @@ A correct implementation of this profile must guarantee:
    multiple config files that can drift out of sync with each other.
 9. **A production release must not ship with an unresolved version mismatch** across its component
    projects, installer metadata, and published release manifest.
+10. **Deployment is separate from project-management status.** Publish scripts require explicit
+    authorization for the named deployment and must not edit, complete, or promote PM items. Any
+    per-item deployment checkpoint is a separately selected PM module, not an implicit part of
+    publishing.
+11. **Human interaction is explicit.** Document interactive-terminal prompts and never simulate a
+    human approval or report a blocked interactive command as successful.

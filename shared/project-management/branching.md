@@ -1,15 +1,15 @@
 # PM Branching Guidance (Optional Module)
 
-> Optional add-on to `workflow.md`. Offer this during PM setup (greenfield or existing) as an
-> opt-in choice — when the developer declines, none of the rules below apply and branching is left
-> entirely to the developer's own judgment.
+> Optional add-on to the selected operating mode. Offer this during PM setup (greenfield or
+> existing) as an opt-in choice — when the developer declines, none of the rules below apply and
+> branching is left entirely to the developer's own judgment.
 
 ## Why this exists
 
-Lifecycle state (`backlog/` -> `current/` -> `release-candidate-dev/` -> `release-candidate/` ->
-`completed/`) lives in files tracked by git. Without a branching convention, PM housekeeping
-commits (creating/editing/moving item files) and feature code commits get tangled together on the
-same working branch, making PM history noisy and merges harder to reason about.
+Work state (`backlog/` -> `current/` -> `completed/`) lives in files tracked by git. Without a
+branching convention, PM housekeeping commits (creating/editing/moving item files) and feature code
+commits get tangled together on the same working branch, making PM history noisy and merges harder
+to reason about.
 
 ## Core principle
 
@@ -55,11 +55,15 @@ Before any code edit or branch creation, the AI must strongly suggest creating a
 first (in `backlog/` or `current/` per the normal lifecycle), so the resulting working branch and
 its commits can be tied to an id. Only after the item exists should Rule 3 apply.
 
-## Rule 5 — Merging a completed item's working branch back to `dev`
+## Rule 5 — Integrating an accepted item's working branch into `dev`
 
-Trigger: the item's code has been confirmed per `workflow.md`'s completion-confirmation gate.
-Suggest merging (or opening a PR per Rule 6) the working branch into `dev`, then ask whether to
-delete the branch or keep it around for traceability. Advisory.
+Trigger: the item's code has been accepted per `workflow.md`, but a required merge/integration step
+is still open.
+
+Suggest merging (or opening a PR per Rule 6) the working branch into `dev`. If integration is part
+of the repository's completion criteria, keep the item in `current/` until integration is complete;
+then update its PM state without asking for a second acceptance. Ask whether to delete the branch or
+keep it around for traceability. Advisory.
 
 ## Rule 6 — Preferring a PR over a local merge
 
@@ -82,9 +86,9 @@ silently.
 
 ## Rule 9 — Item demoted or descoped while its working branch exists
 
-Trigger: the item is moved back to `backlog/` (for example, rejected at the confirmation gate)
-while a working branch for it still exists. Ask whether to keep the branch paused for later,
-delete it, or fold any salvageable changes elsewhere. Advisory.
+Trigger: the item stays active or is descoped while a working branch for it still exists. Ask
+whether to keep the branch paused for later, delete it, or fold any salvageable changes elsewhere.
+Advisory.
 
 ## Rule 10 — Switching away from unfinished work
 
@@ -96,7 +100,9 @@ switching branches with unsaved work in place. Advisory.
 
 Trigger: Rule 3 applies, but a branch named after the item id already exists locally or on the
 remote (for example, from a prior session). Suggest checking out the existing branch instead of
-creating a new or conflicting one. Advisory.
+creating a new or conflicting one. Before resuming any coding or verification on it, first
+reconcile the item's actual completion status per `workflow.md`'s "Resuming a stale or ambiguous
+item" — the branch existing is not proof the item is still unfinished. Advisory.
 
 ## Rule 12 — One branch spanning multiple items
 

@@ -91,6 +91,13 @@ function Invoke-Git {
   }
 }
 
+function Confirm-Deployment {
+  param([Parameter(Mandatory = $true)][string]$Prompt)
+
+  $response = Read-Host "$Prompt [y/N]"
+  return $response -match '^(?i:y|yes)$'
+}
+
 $scriptDir = Split-Path -Parent $PSCommandPath
 Push-Location $scriptDir
 try {
@@ -101,6 +108,17 @@ try {
 
   if ($branch -ne $RequiredBranch) {
     throw "Current branch '$branch' does not match required branch '$RequiredBranch'."
+  }
+
+  $pendingChanges = Invoke-Git -Args @('status', '--porcelain') -CaptureOutput
+  if (-not [string]::IsNullOrWhiteSpace($pendingChanges)) {
+    throw "Working tree must be clean before publishing. Resolve or commit existing changes first.`n$pendingChanges"
+  }
+
+  $action = if ($NoPush) { "commit the dev deployment locally on '$branch'" } else { "commit and push the dev deployment to '$branch'" }
+  if (-not (Confirm-Deployment -Prompt "Authorize $action?")) {
+    Write-Host "Cancelled. No build, file update, commit, or push was performed." -ForegroundColor Yellow
+    return
   }
 
   if (-not $SkipBuild) {

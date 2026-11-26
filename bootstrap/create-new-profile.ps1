@@ -8,7 +8,16 @@ param(
 
     [string]$NewProfileName,
 
-    [switch]$Interactive
+    [ValidateSet('solo', 'team')]
+    [string]$OperatingMode = 'solo',
+
+    [switch]$Interactive,
+
+    [switch]$EnableBranching,
+
+    [switch]$EnableDeploymentCheckpoints,
+
+    [switch]$EnableEvidencePolicy
 )
 
 Set-StrictMode -Version Latest
@@ -21,6 +30,7 @@ function Wait-ForStep {
 
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 Write-Host " Action: Create a New Profile" -ForegroundColor Cyan
+Write-Host " Operating Mode: $OperatingMode" -ForegroundColor Cyan
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 Write-Host ""
 
@@ -60,10 +70,12 @@ Write-Host "  1. Create directory $targetProfileDir and $targetProfileDir\refere
 Write-Host "  2. Inspect the current workspace/target codebase for real architecture evidence."
 Write-Host "  3. Create $targetProfileDir\architecture.md describing components, process model, and versioning."
 Write-Host "  4. Create $targetProfileDir\requirements.md listing mandatory non-negotiable requirements."
-Write-Host "  5. Create $targetProfileDir\implementation-steps.md detailing AI generation steps (Greenfield vs. Existing)."
+Write-Host "  5. Create $targetProfileDir\implementation-steps.md detailing AI generation steps (Greenfield vs. Existing), including the selected PM operating mode and enabled optional modules."
 Write-Host "  6. Create $targetProfileDir\acceptance-checklist.md providing prose verification criteria."
 Write-Host "  7. Copy real working scripts/workflows into $targetProfileDir\reference\ and add $targetProfileDir\reference\README.md."
 Write-Host "  8. Create $targetBootstrapScript using the standard 4-directive AI hand-off loop pattern."
+Write-Host "     It must accept and forward OperatingMode, EnableBranching, EnableDeploymentCheckpoints, and EnableEvidencePolicy."
+Write-Host "     Generated publish scripts must not mutate PM state and must use explicit authorization for the named deployment."
 Write-Host ""
 
 Wait-ForStep "Press ENTER after AI Assistant creates the new profile files..."
@@ -102,13 +114,14 @@ Write-Host "Please execute Step 3: Bootstrap Target Project Using New Profile" -
 Write-Host ""
 Write-Host "Directives:" -ForegroundColor White
 Write-Host "  - Now execute $targetBootstrapScript -ProjectMode $ProjectMode -ToolkitRoot $ToolkitRoot"
+Write-Host "  - Forward the selected operating mode and enabled optional PM modules unchanged."
 Write-Host "  - Proceed to bootstrap the current project using the newly minted $newProfileName profile."
 Write-Host ""
 
 # Dispatch to the newly created profile script if it exists
 if (Test-Path -LiteralPath $targetBootstrapScript) {
     Write-Host "Dispatching to newly created profile script: $targetBootstrapScript ..." -ForegroundColor Cyan
-    & $targetBootstrapScript -ProjectMode $ProjectMode -ToolkitRoot $ToolkitRoot
+    & $targetBootstrapScript -ProjectMode $ProjectMode -ToolkitRoot $ToolkitRoot -OperatingMode $OperatingMode -Interactive:$Interactive -EnableBranching:$EnableBranching -EnableDeploymentCheckpoints:$EnableDeploymentCheckpoints -EnableEvidencePolicy:$EnableEvidencePolicy
 } else {
     Write-Warning "New profile script $targetBootstrapScript was not found. Please verify manual dispatch."
 }

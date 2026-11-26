@@ -10,3 +10,5 @@ A correct implementation of this profile must guarantee:
 6. **Durable Diff Auditing.** Every live release must generate and check in a release diff file (`release/rel-<timestamp>.txt`) recording the exact code changes shipped in that release.
 7. **Release Notes Evidence Gate.** Production releases require release notes generated from diff evidence and formatted according to `RELEASE_NOTES_STYLE.md`.
 8. **Developer Preview Banner.** Non-production hosted environments must display a prominent visual banner (e.g. "DEVELOPER PREVIEW") to prevent operators or users from confusing dev with live production.
+9. **Deployment is separate from project-management status.** Publish scripts require explicit authorization for the named deployment and must not edit, complete, or promote PM items. Any per-item deployment checkpoint is a separately selected PM module, not an implicit part of publishing.
+10. **Human interaction is explicit.** Document interactive-terminal prompts and never simulate a human approval or report a blocked interactive command as successful.

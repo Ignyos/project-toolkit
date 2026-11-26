@@ -1,90 +1,119 @@
-# PM Workflow Rules
+# Shared Project Management Safety Baseline
 
-`project-management.md` is a pure index. This file owns the rules. See `AGENTS.md` for current
-direction and priorities — this file only defines process.
+This file defines the rules shared by every operating mode. During bootstrap, compose it with
+exactly one of `solo-mode.md` or `team-mode.md`, then add only the optional modules the developer
+selected. The generated `PM/workflow.md` must name its operating mode and enabled modules.
 
-## Lifecycle
+`PM/project-management.md` is an index, not a second source of workflow rules. Product priorities
+and broad roadmap status belong in the project's roadmap, if one exists.
 
-`backlog/` -> `current/` -> `release-candidate-dev/` -> `release-candidate/` -> `completed/`
+## Work lifecycle
 
-Moving an item between folders is a plain file move. Its id (for example `bug-001`, `feat-002`)
-never changes.
+The default work lifecycle is:
 
-## Ids and prefixes
+`backlog/` -> `current/` -> `completed/`
 
-Per-prefix counters, not a global counter: `bug-001`, `bug-002`, ... and `feat-001`, `feat-002`, ...
-counted separately. Starter prefixes: `bug`, `feat`, `chore`, `task`, `spike`.
+`completed/` means the work is implemented, required validation has passed, any integration step
+required by the agreed criteria or repository policy is complete, and an authorized human has
+accepted the result. It does not mean deployed or released. Deployment state is tracked separately
+and never changes an item's work status.
 
-## Completion confirmation
+Moving an item between folders is a plain file move. Its id (for example, `bug-001` or `feat-002`)
+never changes. Use per-prefix counters, not a global counter. Starter prefixes: `bug`, `feat`,
+`chore`, `task`, and `spike`.
 
-Work is done in slices. A slice may cover one item or several. A slice is bounded by the work
-actually performed — it is never sized to reduce how often the developer is asked.
+## Ownership and approval boundaries
 
-- An item is never marked complete, and never leaves `current/`, on AI judgment alone.
-- At the end of a slice the AI stops and presents one confirmation request listing every item that
-  slice touched. For each item it states what changed, how it was verified, and what was not
-  covered.
-- The developer answers per item. A single approval covering the whole list is allowed only when
-  the developer gives it explicitly; it is never assumed from silence or from a general "looks good".
-- Confirmed: update the item file, then perform the folder move.
-- Rejected: the item stays where it is and the feedback is appended to its item file so the next
-  session does not relitigate it.
-- Request first, write second. Marking an item complete in the same turn as asking defeats the gate.
-- Only items the slice actually touched appear in the list. Unrelated in-flight items are not
-  bundled in to ride along on the same approval.
+During bootstrap, ask who is accountable for priorities and acceptance, and who may authorize
+deployment and other consequential external actions. These may be the same person. In Team mode,
+ask for reviewer/maintainer roles as needed. Record the agreed roles; do not infer them or assume an
+AI assistant has any of these authorities.
 
-## Verification scope discipline
+- The developer defines or confirms scope and acceptance criteria. The AI may investigate, plan,
+  implement, run in-scope validation, and report findings within that agreed scope.
+- An authorized human accepts a completed work slice. The AI may update the affected item records
+  and lifecycle locations after that acceptance; do not ask for a second approval solely to perform
+  this PM bookkeeping.
+- Deploying, publishing, tagging, pushing, deleting shared data, or other consequential external
+  actions require explicit authorization for that action. Approval to implement or accept work is
+  not deployment approval.
+- A deployment confirmation authorizes only the stated deployment. It does not certify individual
+  work items, accept them, or change their PM state.
+- If authority, acceptance, scope, or the effect of an action is unclear, stop and ask. Silence,
+  a general "looks good," or approval for a different action is not authorization.
 
-An item's existing acceptance criteria define what "done" means. Verifying that criteria stays
-inside it; verification is not a side door for growing the item.
+Use short, case-insensitive choices such as `Yes` / `No`, show the default, and make cancellation
+effects clear. For consequential actions, the default is `No`.
 
-- Before adding a new check, script, or build step to verify an item, state what it is checking
-  and what result would satisfy it. If that can't be stated up front, it isn't ready to run.
-- A verification path must have a stated completion condition and a bounded number of attempts. If
-  meeting that condition requires new tooling, source changes, or repeated retries, stop — that is
-  new scope, not verification.
-- A failed verification result is evidence about the item's *existing* acceptance criteria. It is
-  not, by itself, license to invent new acceptance criteria, new tooling, or new build/test steps.
-- Sort every verification finding into one of three named buckets, and only act on the first two:
-  1. **Implementation incorrect** — fix it.
-  2. **Implementation correct but unverified** — verify it, within the bounded attempts above.
-  3. **Additional confidence would be nice to have** — out of scope; surface it as a suggestion,
-     don't build it.
-- A cancelled command, a second failed attempt at the same check, or the developer naming a loop
-  or repetition is a stop signal. Stop, summarize what is confirmed vs. still open, and wait — do
-  not rerun or re-expand the same verification path without the developer explicitly asking to
-  continue.
-- If a self-added check needs its own rounds of fixes before it can even run cleanly, that check is
-  new scope, not verification. Pause and ask whether it belongs in this item before continuing.
+## Work completion and review
 
-## Checkpoints
+Work is completed in bounded slices, sized to the work actually performed. Before starting, the
+slice has observable acceptance criteria and a stated validation scope. At the end, report what
+changed, what validation ran and passed or
+failed, and what remains unverified. Ask the authorized human to accept the clearly enumerated
+slice using a short, visible-default choice (for example, `Accept this slice? [y/N]`). One
+acceptance may cover the whole slice; do not
+require separate repeated approval for each item when its criteria and review are shared. Do not
+bundle unrelated, untouched items into the approval. Do not infer acceptance from silence or a
+general "looks good." If acceptance is declined, keep the item active and record the requested
+follow-up in its item notes.
 
-- Adding an item to `release-candidate-dev/` creates an expectation that a dev build/deploy is
-  coming next.
-- Every dev deploy reviews **every** item currently in `release-candidate-dev/`. For each, ask
-  directly: "did this get verified? Promote to `release-candidate/`, or demote?"
-- A demoted item's target (`current/` or `backlog/`) is decided in the moment by asking — there is
-  no fixed rule for which one applies.
-- This checkpoint is a blocking step inside the dev-publish script itself, using the standard
-  script-prompt / actor-input loop.
+Do not mark work complete on AI judgment alone. Once accepted, update the item and move it to
+`completed/` without another approval prompt for the status update.
 
-## Production release
+## Resuming a stale or ambiguous item
 
-- Everything in `release-candidate/` at release time is, by definition, part of the release — no
-  diff-matching needed.
-- At the start of a new production release: empty `completed/` (delete what the previous release
-  left there) and commit that deletion, then batch-move everything from `release-candidate/` into
-  `completed/`, then create the release tag and push. `completed/` never accumulates across
-  releases; full history stays recoverable through git log.
-- The release script may use both the raw diff and the `release-candidate/` item files together to
-  ground release-notes generation.
+An item can appear unfinished because implementation is incomplete or because its PM record has not
+caught up. Before resuming coding or verification, read the item's acceptance criteria and ask the
+developer whether the implementation is already believed complete.
 
-## Dev deploys never touch PM state outside the checkpoint above
+- If it is believed complete but criteria remain unchecked, ask whether the criterion is still
+  required, should be revised, or should be deferred/dropped. Do not silently expand verification.
+- If further verification is still required, agree on its bounded path and completion condition
+  before running it.
+- An existing working branch or an item remaining in `current/` is not proof that more coding is
+  required. Reconcile the actual status first.
 
-No other PM folder transition happens on a dev deploy.
+## Verification scope
 
-## Optional: branch discipline
+An item's acceptance criteria define what "done" means. Verification must stay within them.
 
-`branching.md` is an opt-in companion to this file covering how PM housekeeping changes and code
-changes should be split across `dev` and per-item working branches. It only applies if the project
-opted in during bootstrap and `PM/branching.md` exists.
+- Before adding a check, state what it verifies and the result that would satisfy it.
+- Every verification path has a completion condition and a bounded number of attempts.
+- A failed check is evidence about the existing criteria, not permission to invent new scope,
+  tooling, or build steps.
+- Classify findings as **implementation incorrect**, **correct but unverified**, or **additional
+  confidence only**. Fix the first, verify the second within scope, and surface the third without
+  expanding the task.
+- Stop after cancellation, a repeated failure, or a request to stop. Summarize confirmed and open
+  results; do not retry or broaden the path without authorization.
+
+## PM state and publishing are independent
+
+Publishing scripts and workflows operate on build/deployment inputs only. They must not move,
+delete, edit, or mark PM items complete, nor make per-item verification or promotion decisions.
+Keep deployment authorization, feature verification, human acceptance, and PM state updates as
+separate decisions.
+
+Projects may opt into the `deployment-checkpoints.md` module for separate candidate tracking and
+promotion. Even then, deployment scripts only perform the explicitly authorized deployment; the
+checkpoint is a separate workflow action.
+
+## Interactive terminal requirements
+
+When a command requires a human response (for example, PowerShell `Read-Host`), state which step
+needs the developer's interactive terminal and what choices it presents. Do not simulate approval,
+pipe a guessed response, or claim a command succeeded when it stopped waiting for input. If the
+developer cannot interact with that terminal, stop before the gated action and offer a safe
+non-mutating alternative where one exists.
+
+## Optional modules
+
+Only apply coordination rules that were selected during setup:
+
+- `branching.md` — advisory branch and PM housekeeping practices.
+- `deployment-checkpoints.md` — separate per-item deployment candidate review and promotion.
+- `evidence-policy.md` — persistent per-item verification records.
+
+Absence of a module means its additional rules do not apply. A repository's own branch protection,
+CI policy, and release safeguards remain in force regardless of PM mode or module selection.

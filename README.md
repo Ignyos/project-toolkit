@@ -13,7 +13,7 @@ Traditional project templates and shared CI/CD scripts force every project into 
 
 - 🤖 **Documentation as Executable Rules**: Each project type is defined by an `architecture.md` and `requirements.md`. AI agents generate fresh, idiomatic scripts and workflows tailored specifically to *your* project's constraints.
 - 🧹 **Zero Repository Clutter (Ephemeral Bootstrapping)**: The toolkit is shallow-cloned temporarily into a `.scratch-toolkit/` directory during setup and **deleted as soon as bootstrapping completes**. Nothing stays in your repo except a 5-line origin breadcrumb header in generated files.
-- 📋 **AI-Driven Project Management**: Built-in `PM/` conventions (`backlog` → `current` → `release-candidate-dev` → `release-candidate` → `completed`) keep AI development sessions strictly aligned with current priorities without status drift.
+- 📋 **Adaptable AI-Driven Project Management**: Choose Solo or Team workflow independently from the technology profile. The shared `backlog` → `current` → `completed` lifecycle keeps work status separate from deployment; branch discipline, per-item evidence, and deployment checkpoints are optional modules.
 - 🚀 **Dual-Lane Release Architecture**: Built-in dev and production lane isolation ensures dev builds never leak pre-production code or dev domains into live releases.
 
 ---
@@ -27,10 +27,10 @@ Please bootstrap or reconcile this repository using the Ignyos Project Toolkit.
 
 Follow these steps:
 1. Run `git clone --depth 1 https://github.com/Ignyos/project-toolkit .scratch-toolkit` in the terminal to shallow-clone the toolkit.
-2. Run `.\.scratch-toolkit\bootstrap.ps1` in PowerShell. Answer the interview prompts (choose Full Profile or Project Management Only, then Greenfield or Existing). Ask me to decide if you are unsure.
+2. Run `.\.scratch-toolkit\bootstrap.ps1` in PowerShell. Answer the interview prompts (choose Full Profile or Project Management Only, Greenfield or Existing, Solo or Team, and any optional coordination modules). Ask me to decide if you are unsure.
 3. The script prints numbered AI ASSISTANT DIRECTIVES and then exits. Those directives are YOUR task list: read the listed context files and carry out every directive yourself. Do not wait for the script to prompt you again.
 4. Apply origin breadcrumbs per `shared/breadcrumb-spec.md` to generated files.
-5. Reconcile or set up `AGENTS.md` and `PM/` project management structure per the profile guidelines.
+5. Reconcile or set up `AGENTS.md` and the selected `PM/` workflow. Record who may accept work and authorize deployment; these are separate decisions.
 6. Once implementation and acceptance verification are complete, delete the `.scratch-toolkit` directory.
 ```
 
@@ -84,5 +84,5 @@ If an existing or greenfield project does not fit any existing profile in `profi
 - `shared/` — Cross-cutting conventions.
   - `breadcrumb-spec.md` — Comment header format for generated files.
   - `ai-direction-guidance.md` — Guidance for setting up `AGENTS.md` and Copilot instructions.
-  - `project-management/` — Standard `PM/` folder structure and workflow rules, plus an optional
-    `branching.md` add-on for advisory branch-discipline rules.
+  - `project-management/` — Shared safety rules, Solo and Team overlays, and separately selectable
+    branching, deployment-checkpoint, and per-item evidence modules.

@@ -6,9 +6,16 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ToolkitRoot,
 
+    [ValidateSet('solo', 'team')]
+    [string]$OperatingMode = 'solo',
+
     [switch]$Interactive,
 
-    [switch]$EnableBranching
+    [switch]$EnableBranching,
+
+    [switch]$EnableDeploymentCheckpoints,
+
+    [switch]$EnableEvidencePolicy
 )
 
 Set-StrictMode -Version Latest
@@ -25,6 +32,7 @@ $profileDir = Join-Path $ToolkitRoot "profiles\$profileName"
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 Write-Host " Profile: $profileName" -ForegroundColor Cyan
 Write-Host " Mode:    $ProjectMode" -ForegroundColor Cyan
+Write-Host " Operating: $OperatingMode" -ForegroundColor Cyan
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 Write-Host ""
 
@@ -45,26 +53,45 @@ Write-Host ""
 Write-Host "Please execute Step 1: AI Direction & Project Management Setup" -ForegroundColor White
 Write-Host ""
 Write-Host "Context files to read:" -ForegroundColor Gray
-Write-Host "  1. $ToolkitRoot\shared\ai-direction-guidance.md" -ForegroundColor Gray
-Write-Host "  2. $ToolkitRoot\shared\project-management\workflow.md" -ForegroundColor Gray
-Write-Host "  3. $profileDir\architecture.md" -ForegroundColor Gray
+Write-Host "  - $ToolkitRoot\shared\ai-direction-guidance.md" -ForegroundColor Gray
+Write-Host "  - $ToolkitRoot\shared\project-management\workflow.md" -ForegroundColor Gray
+Write-Host "  - $ToolkitRoot\shared\project-management\$OperatingMode-mode.md" -ForegroundColor Gray
+Write-Host "  - $profileDir\architecture.md" -ForegroundColor Gray
 if ($EnableBranching) {
-    Write-Host "  4. $ToolkitRoot\shared\project-management\branching.md" -ForegroundColor Gray
+    Write-Host "  - $ToolkitRoot\shared\project-management\branching.md" -ForegroundColor Gray
+}
+if ($EnableDeploymentCheckpoints) {
+    Write-Host "  - $ToolkitRoot\shared\project-management\deployment-checkpoints.md" -ForegroundColor Gray
+}
+if ($EnableEvidencePolicy) {
+    Write-Host "  - $ToolkitRoot\shared\project-management\evidence-policy.md" -ForegroundColor Gray
 }
 Write-Host ""
 Write-Host "Directives:" -ForegroundColor White
 if ($ProjectMode -eq 'greenfield') {
     Write-Host "  - Greenfield Mode: Create AGENTS.md and .github/copilot-instructions.md fresh."
-    Write-Host "  - Create PM/ structure (project-management.md, workflow.md, backlog/, current/, release-candidate-dev/, release-candidate/, completed/)."
+    Write-Host "  - Create PM/ structure for the selected mode (project-management.md, workflow.md, backlog/, current/, completed/)."
 } else {
     Write-Host "  - Existing Mode: Inspect existing AGENTS.md / .github/copilot-instructions.md."
     Write-Host "  - Reconcile and append PM pointer without overwriting project-specific direction."
     Write-Host "  - Establish dev branch if only main exists."
-    Write-Host "  - Reconcile PM/ structure."
+    Write-Host "  - Reconcile PM/ structure for the selected mode."
+    Write-Host "  - Preserve PM history and existing optional policies; ask before changing ambiguous item states or disabling/removing an existing module."
 }
+Write-Host "  - Compose PM/workflow.md from the shared safety baseline and selected operating-mode overlay."
+Write-Host "  - Ask the developer to identify the accountable owner, acceptance authority, and deployment authority; record roles, never infer them."
+Write-Host "  - Keep deployment separate from work acceptance and PM state; never have publish scripts edit PM records."
+Write-Host "  - Add a 'Project Management Mode: $OperatingMode; see PM/workflow.md' pointer in AGENTS.md / copilot-instructions.md."
 if ($EnableBranching) {
     Write-Host "  - Copy branching.md into PM/branching.md, add its breadcrumb, and add a 'Branching Policy: enabled, see PM/branching.md' pointer line next to the PM/workflow.md pointer in AGENTS.md / copilot-instructions.md."
 }
+if ($EnableDeploymentCheckpoints) {
+    Write-Host "  - Add the deployment-checkpoint rules from deployment-checkpoints.md; maintain separate candidate indexes without moving work items and add a pointer in AI direction files."
+}
+if ($EnableEvidencePolicy) {
+    Write-Host "  - Copy evidence-policy.md into PM/evidence-policy.md and add its breadcrumb and pointer in AI direction files."
+}
+Write-Host "  - Document interactive-terminal steps and never simulate human approval input."
 Write-Host ""
 
 Wait-ForStep "Press ENTER after AI Assistant completes Step 1..."
@@ -84,6 +111,8 @@ Write-Host "  4. Breadcrumb spec in $ToolkitRoot\shared\breadcrumb-spec.md" -For
 Write-Host ""
 Write-Host "Directives:" -ForegroundColor White
 Write-Host "  - Apply origin breadcrumbs to all generated files."
+Write-Host "  - Ensure publishing prompts are short, default-No, and authorize only the named deployment."
+Write-Host "  - Ensure publishing performs no PM item, candidate-list, or completion-state transitions."
 Write-Host "  - Generate build.ps1, dev-publish.ps1, release.ps1, clean.ps1, and RELEASE_NOTES_STYLE.md."
 Write-Host "  - Generate or merge .vscode/launch.json and .github/workflows/."
 Write-Host "  - Configure environment preview banner (dev-site-banner.js) and CNAME files."
@@ -103,7 +132,7 @@ Write-Host "  1. $profileDir\acceptance-checklist.md" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Directives:" -ForegroundColor White
 Write-Host "  - Walk through acceptance-checklist.md prose requirements."
-Write-Host "  - Verify timestamp version identity, CNAME dual-lane isolation, branch gating, release notes AI gate, and banner configuration."
+Write-Host "  - Verify timestamp version identity, CNAME dual-lane isolation, branch gating, release notes AI gate, banner configuration, and the selected PM mode and optional modules."
 Write-Host ""
 
 Wait-ForStep "Press ENTER after AI Assistant completes Step 3..."

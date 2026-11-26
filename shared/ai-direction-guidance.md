@@ -31,7 +31,8 @@ When bootstrapping a new project:
    - Project purpose and a pointer to where canonical status lives (per the ownership rules above)
      — not a restated copy of the active item id or roadmap detail.
    - Required workflow rules (e.g. read status before answering roadmap questions).
-   - Pointer sentence to `PM/workflow.md` for project management lifecycle rules.
+   - Pointer sentence identifying the selected project-management mode and linking to
+     `PM/workflow.md` (for example, `Project Management Mode: Solo; see PM/workflow.md`).
 2. Create `.github/copilot-instructions.md` with repository-specific Copilot instructions aligned with `AGENTS.md`.
 
 ## Existing Project Reconciliation
@@ -40,13 +41,40 @@ When adopting the toolkit in an existing project:
 
 1. **Read existing AI direction files first.** Inspect `AGENTS.md`, `.github/copilot-instructions.md`, or similar files.
 2. **Preserve existing project context.** Do not overwrite existing status, architectural notes, or custom project rules.
-3. **Append / Merge profile direction rules.** Add the pointer to `PM/workflow.md` and any profile-specific constraints (e.g., version source of truth rules or dual-lane publishing requirements).
-4. Verify that the reconciled file does not contain contradictory guidance or duplicate sections.
+3. **Preserve PM history.** Reconcile lifecycle locations without deleting items or changing IDs. If an existing item's status or destination is ambiguous, ask before moving or marking it complete.
+4. **Preserve existing optional policies.** A module not selected during bootstrap must not be added. If an existing module is present but not selected, preserve it and ask before disabling or removing it.
+5. **Append / Merge profile direction rules.** Add the selected mode pointer to `PM/workflow.md` and any profile-specific constraints (e.g., version source of truth rules or dual-lane publishing requirements).
+6. Verify that the reconciled files do not contain contradictory guidance or duplicate sections.
+
+## Project-Management Operating Mode and Optional Modules
+
+The Solo/Team operating mode is selected independently from the technology profile. Compose
+`PM/workflow.md` from `shared/project-management/workflow.md` and exactly one of
+`solo-mode.md` or `team-mode.md`. During setup, ask the developer for the accountable owner,
+acceptance authority, and deployment authority; they may be the same role. In Team mode, ask for
+reviewer/maintainer roles where applicable. Record the agreed roles and do not infer who can accept
+work or authorize deployment.
+
+The shared baseline uses `backlog/`, `current/`, and `completed/`; `completed/` means implemented,
+validated, and accepted, not deployed. Work acceptance and PM updates are separate from deployment,
+but an accepted slice needs no second approval just to update PM status.
+
+Optional controls are independent of operating mode and should be included only when selected:
+
+- `deployment-checkpoints.md` — separate deployment candidate tracking and per-item promotion.
+- `evidence-policy.md` — persistent per-item verification notes.
+- `branching.md` — advisory branch and PM housekeeping practices.
+
+If a module is enabled, copy it into `PM/`, apply its breadcrumb, and add a concise pointer next to
+the mode pointer in `AGENTS.md` / `.github/copilot-instructions.md`. Do not create unselected module
+files. A profile's deployment lanes and branch requirements remain technology-specific; they do not
+imply that work items must follow a deployment lifecycle.
 
 ## Optional: Branch-Discipline Guidance
 
-`shared/project-management/branching.md` is an opt-in module layered on top of `workflow.md`. It
-is offered as a developer choice during bootstrap (greenfield or existing), never assumed:
+`shared/project-management/branching.md` is an opt-in module layered on top of the selected
+operating mode. It is offered as a developer choice during bootstrap (greenfield or existing),
+never assumed:
 
 1. If the developer opts in, copy `branching.md` into `PM/branching.md` in the target project and
    apply the origin breadcrumb per `shared/breadcrumb-spec.md`.

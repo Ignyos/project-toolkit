@@ -186,6 +186,11 @@ try {
     Write-Warning "Branch '$branchName' is not 'main'. This run is test-only; commit, tag, and push are disabled."
   }
 
+  $statusBefore = Invoke-Git -Args @("status", "--porcelain") -CaptureOutput
+  if (-not [string]::IsNullOrWhiteSpace($statusBefore)) {
+    throw "Working tree must be clean before release. Resolve or commit existing changes first.`n$statusBefore"
+  }
+
   $releaseNotesPath = Join-Path $repoRoot "RELEASE_NOTES.md"
   if (-not (Test-Path -LiteralPath $releaseNotesPath)) {
     if ($WhatIfMode) {
@@ -200,14 +205,6 @@ try {
   $releaseNotesStylePath = Join-Path $repoRoot "RELEASE_NOTES_STYLE.md"
   if (-not (Test-Path -LiteralPath $releaseNotesStylePath)) {
     throw "Required file not found: $releaseNotesStylePath"
-  }
-
-  $statusBefore = Invoke-Git -Args @("status", "--porcelain") -CaptureOutput
-  if (-not [string]::IsNullOrWhiteSpace($statusBefore)) {
-    Write-Warning "Working tree is not clean."
-    if (-not (Confirm-YesNo -Prompt "Continue release anyway?" -DefaultNo)) {
-      throw "Release cancelled by user."
-    }
   }
 
   $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd-HH-mm")
@@ -278,13 +275,22 @@ Instructions:
     Write-Host "[WhatIf] Would copy AI prompt to clipboard." -ForegroundColor Yellow
   }
   else {
-    Set-Clipboard -Value $aiPrompt
-    Write-Host "Release-notes prompt copied to clipboard." -ForegroundColor Green
+    try {
+      Set-Clipboard -Value $aiPrompt
+      Write-Host "Release-notes prompt copied to clipboard." -ForegroundColor Green
+    }
+    catch {
+      Write-Warning "Could not copy the release-notes prompt to the clipboard. Copy it manually from the text below."
+      Write-Host $aiPrompt
+    }
   }
 
   Write-Host ""
-  Write-Host "Paste the prompt into AI, apply RELEASE_NOTES.md updates, then continue." -ForegroundColor Cyan
-  Read-Host "Press Enter when release notes are ready"
+  Write-Host "Paste the prompt into AI, apply RELEASE_NOTES.md updates, then confirm when ready." -ForegroundColor Cyan
+  if (-not (Confirm-YesNo -Prompt "Are release notes ready? Cancel to stop before release" -DefaultNo)) {
+    Write-Host "Release cancelled. No commit, tag, or push was performed; generated local release files may remain for review." -ForegroundColor Yellow
+    return
+  }
 
   if ($isTestRun) {
     Write-Host ""
@@ -292,17 +298,15 @@ Instructions:
     return
   }
 
+  $publishAction = if ($NoPush) { "commit and tag release $tagName locally" } else { "commit, tag, and push release $tagName" }
+  if (-not (Confirm-YesNo -Prompt "Authorize $publishAction" -DefaultNo)) {
+    Write-Host "Release cancelled. No commit, tag, or push was performed; generated local release files may remain for review." -ForegroundColor Yellow
+    return
+  }
+
   $statusAfterNotes = Invoke-Git -Args @("status", "--porcelain") -CaptureOutput
   if ([string]::IsNullOrWhiteSpace($statusAfterNotes)) {
-    Write-Warning "No file changes detected after release-notes step."
-    if ($isFirstRelease) {
-      Write-Host "No previous release tag detected; continuing with first-release tag/push." -ForegroundColor Cyan
-    }
-    else {
-      if (-not (Confirm-YesNo -Prompt "Continue with tag/push anyway?" -DefaultNo)) {
-        throw "Release cancelled by user."
-      }
-    }
+    Write-Warning "No file changes detected after release-notes step. The final authorization applies to creating the release tag and pushing it."
   }
   else {
     Invoke-Git -Args @("add", "-A")
