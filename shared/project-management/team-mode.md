@@ -12,7 +12,9 @@ profile. Use it with the shared safety baseline.
   them. Do not make every field or a particular approval sequence mandatory by default.
 - Team members may prepare and review work according to the agreed roles. Only an authorized human
   accepts work; a reviewer decision does not itself authorize a deployment.
-- Pull requests, separate PM commits, per-item evidence, and deployment candidate checkpoints are
-  governed by repository policy or explicitly selected optional modules, not by Team mode alone.
+- Pull requests, per-item evidence, and deployment candidate checkpoints are governed by repository
+  policy or explicitly selected optional modules, not by Team mode alone. When using task branches,
+  normally include related PM updates with accepted slice commits and use one PR per task; handle
+  team- or repository-specific exceptions individually.
 - Make handoffs resumable: keep current scope, acceptance criteria, decisions, validation status,
   and next action in the owning item or project documentation.
