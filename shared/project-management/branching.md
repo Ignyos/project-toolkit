@@ -6,17 +6,18 @@
 
 ## Why this exists
 
-Work state (`backlog/` -> `current/` -> `completed/`) lives in files tracked by git. Without a
-branching convention, PM housekeeping commits (creating/editing/moving item files) and feature code
-commits get tangled together on the same working branch, making PM history noisy and merges harder
-to reason about.
+Work state (`backlog/` -> `current/` -> `completed/`) lives in files tracked by git. This convention
+keeps unrelated PM housekeeping distinct while allowing task records to travel with the approved
+work they describe.
 
 ## Core principle
 
-Two kinds of changes are treated differently:
+Two kinds of changes are coordinated differently:
 
-- **PM housekeeping changes** — creating, editing, or moving item files under `PM/`. These belong
-  on `dev`.
+- **Task-related PM changes** — updating the task's item file to reflect an approved slice. These
+  belong on that task's working branch and are normally committed with the slice.
+- **Unrelated PM housekeeping changes** — creating or editing unrelated item files under `PM/`.
+  These may be committed directly to `dev` when already on `dev`.
 - **Code changes** — everything else. These belong on a dedicated working branch, never committed
   directly to `dev`.
 
@@ -29,19 +30,16 @@ with a short slug appended: `<id>-<slug>` (for example `feat-014-branch-policy`)
 
 No special handling needed. Commit the PM item change directly to `dev`.
 
-## Rule 2 — Adding/editing a PM item while on a working branch
+## Rule 2 — Updating the task's PM record on a working branch
 
-The AI must not switch branches or commit on the developer's behalf without confirmation. Suggested
-sequence, offered as a strong suggestion (not a hard gate):
+The AI must not switch branches or commit on the developer's behalf without confirmation. Keep
+task-related PM updates on the working branch; do not switch to `dev` or merge `dev` back merely to
+record task progress. Suggested sequence, offered as a strong suggestion (not a hard gate):
 
-1. If the working branch has uncommitted changes, suggest committing them first.
-2. Switch to `dev`.
-3. Create/edit the PM item and commit it to `dev`.
-4. Switch back to the working branch the developer was on.
-5. Merge `dev` into the working branch so it picks up the new item.
-
-This sequence is a candidate for a helper script (for example `scripts/pm-sync.ps1`) so the
-developer can run one command instead of the AI performing multiple git operations by hand.
+1. Update the task's PM record to reflect the slice.
+2. Present the slice and validation results for local review and explicit acceptance.
+3. After acceptance, normally commit the slice and its related PM update together.
+4. Keep the task item in `current/` until its completion criteria and required integration are met.
 
 ## Rule 3 — Starting code work on an existing item while on `dev`
 
@@ -55,34 +53,35 @@ Before any code edit or branch creation, the AI must strongly suggest creating a
 first (in `backlog/` or `current/` per the normal lifecycle), so the resulting working branch and
 its commits can be tied to an id. Only after the item exists should Rule 3 apply.
 
-## Rule 5 — Integrating an accepted item's working branch into `dev`
+## Rule 5 — Integrating an accepted task into `dev`
 
-Trigger: the item's code has been accepted per `workflow.md`, but a required merge/integration step
-is still open.
+Trigger: the task's approved slices are ready, but a required merge/integration step is still open.
 
-Suggest merging (or opening a PR per Rule 6) the working branch into `dev`. If integration is part
-of the repository's completion criteria, keep the item in `current/` until integration is complete;
-then update its PM state without asking for a second acceptance. Ask whether to delete the branch or
-keep it around for traceability. Advisory.
+Suggest integrating the task branch, normally with one PR for the task containing its accepted slice
+commits and related PM updates, rather than a PR per slice. If integration is part of the repository's
+completion criteria, keep the item in `current/` until integration is complete; then update its PM
+state without asking for a second acceptance. Where the project publishes to dev, typically publish
+once after integration; handle exceptions individually and obtain the required deployment
+authorization. Ask whether to delete the branch or keep it around for traceability. Advisory.
 
 ## Rule 6 — Preferring a PR over a local merge
 
-Trigger: the repository uses branch protection or PR-based review on `dev`. Suggest opening a PR
-from the working branch instead of merging locally, and wait for the PR to be completed before
-treating the item as merged. If it's unclear which mode the repo uses, ask rather than assume.
-Advisory.
+Trigger: the repository uses branch protection or PR-based review on `dev`. Suggest opening one PR
+for the task instead of merging locally, and wait for the PR to be completed before treating the
+task as integrated. Do not open a separate PR for each accepted slice by default. If it's unclear
+which mode the repo uses, ask rather than assume. Advisory.
 
 ## Rule 7 — Working branch has fallen behind `dev`
 
 Trigger: `dev` has advanced with other merged items since the working branch was created. Before
-continuing work, or before the Rule 5 merge, suggest merging (or rebasing) `dev` into the working
-branch first so the eventual merge is small and current. Advisory.
+continuing work, or before the Rule 5 integration, suggest merging (or rebasing) `dev` into the
+working branch if needed to resolve divergence or meet repository policy. Do not sync solely to make
+task-related PM updates visible on `dev`; they become visible when the task is integrated. Advisory.
 
 ## Rule 8 — Merge conflict while syncing `dev` into a working branch
 
-Trigger: a conflict occurs during the Rule 2 dev-sync step or the Rule 7 sync. Stop, surface the
-conflicting files, and ask the developer how to resolve them. Never auto-resolve a conflict
-silently.
+Trigger: a conflict occurs during a Rule 7 sync. Stop, surface the conflicting files, and ask the
+developer how to resolve them. Never auto-resolve a conflict silently.
 
 ## Rule 9 — Item demoted or descoped while its working branch exists
 
@@ -129,11 +128,11 @@ edit is about to be made. Stop and warn before proceeding, and suggest switching
 appropriate working branch. Treat this closer to blocking given the risk of contaminating a
 release branch.
 
-## Rule 16 — Mixed-purpose dirty working branch
+## Rule 16 — Task PM updates alongside code changes
 
-Trigger: a working branch has both code changes and a staged or unstaged PM item edit at the same
-time. Suggest splitting them: route the PM edit through the Rule 2 dev-sync sequence separately
-from the code commit, rather than committing both together.
+Trigger: a working branch has code changes and a PM update for the same task. Keep the related PM
+update with the approved slice commit rather than splitting it into a separate dev commit. Keep
+unrelated PM housekeeping separate. Advisory.
 
 ## Enforcement style
 

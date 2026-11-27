@@ -59,7 +59,23 @@ general "looks good." If acceptance is declined, keep the item active and record
 follow-up in its item notes.
 
 Do not mark work complete on AI judgment alone. Once accepted, update the item and move it to
-`completed/` without another approval prompt for the status update.
+`completed/` without another approval prompt for the status update only when the item's acceptance
+criteria are all satisfied and any required integration is complete. For a partial slice, record
+the accepted progress but keep the item in `current/`.
+
+## Slice commits and task integration
+
+Review each bounded slice locally and report its validation before requesting acceptance. After
+acceptance, normally commit that slice together with its related PM-record updates; do not make a
+separate administrative commit just to keep task records current. Keep unaccepted work out of an
+approved-slice commit unless the developer explicitly chooses otherwise.
+
+When a task uses a branch and pull requests, normally use one PR for the task, containing its
+approved slice commits and related PM updates, rather than opening a PR for each slice. For projects
+that publish to a dev environment, typically publish once after the task is integrated. Handle
+exceptions individually according to project needs and repository policy. Integration, PR approval,
+and deployment remain separate from slice acceptance; publishing still requires explicit
+authorization.
 
 ## Resuming a stale or ambiguous item
 
